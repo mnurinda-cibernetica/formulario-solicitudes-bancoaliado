@@ -897,7 +897,7 @@
             const form = document.getElementById('bankForm');
 
             // Verificar parámetros requeridos
-            const requiredParams = ['nombre', 'apellido', 'nacionalidad', 'identificacion', 'tipo_identificacion', 'fecha_nacimiento', 'tipo_cuenta', 'id_solicitud'];
+            const requiredParams = ['tipo_identificacion', 'tipo_cuenta', 'id_solicitud'];
             const missingParams = requiredParams.filter(param => !params[param]);
 
             if (missingParams.length > 0) {
