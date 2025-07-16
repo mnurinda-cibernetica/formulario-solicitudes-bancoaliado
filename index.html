@@ -731,10 +731,8 @@
 
     <script>
         // Variables globales
-        let authCookies = null;
-        let bpmcsrfToken = null;
         let solicitudId = null;
-        const creatioBaseUrl = 'https://11006607-demo.creatio.com';
+        const LAMBDA_API_URL = 'https://6hi4cywdq0.execute-api.us-east-1.amazonaws.com/dev/application-registration'; // Reemplaza con tu URL real
 
         // Función para obtener parámetros de la URL
         function getURLParameters() {
@@ -748,85 +746,37 @@
             return params;
         }
 
-        // Función para autenticar en Creatio
-        async function authenticateCreatio() {
+        // Función para enviar datos a la Lambda
+        async function sendDataToLambda(formData) {
             try {
-                const response = await fetch(`${creatioBaseUrl}/ServiceModel/AuthService.svc/Login`, {
+                const payload = {
+                    id_solicitud: solicitudId,
+                    form_data: formData
+                };
+
+                console.log('Enviando datos a Lambda:', payload);
+
+                const response = await fetch(LAMBDA_API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        UserName: "Supervisor",
-                        UserPassword: "hS3433OgZwb2."
-                    })
+                    body: JSON.stringify(payload)
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Authentication failed: ${response.status}`);
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
 
                 const result = await response.json();
-                
-                if (result.Code !== 0) {
-                    throw new Error(`Authentication error: ${result.Message}`);
-                }
+                console.log('Respuesta de Lambda:', result);
+                return result;
 
-                // Obtener cookies de autenticación
-                const cookies = response.headers.get('Set-Cookie');
-                if (cookies) {
-                    authCookies = cookies;
-                }
-
-                // Obtener BPMCSRF token
-                const bpmcsrfResponse = await fetch(`${creatioBaseUrl}/0/rest/BpmCsrfToken`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    credentials: 'include'
-                });
-
-                if (bpmcsrfResponse.ok) {
-                    const tokenResult = await bpmcsrfResponse.json();
-                    bpmcsrfToken = tokenResult.BpmCsrfToken;
-                }
-
-                return true;
             } catch (error) {
-                console.error('Authentication error:', error);
-                return false;
-            }
-        }
-
-        // Función para enviar datos a Creatio
-        async function sendDataToCreatio(formData) {
-            try {
-                const headers = {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                };
-
-                if (bpmcsrfToken) {
-                    headers['BPMCSRF'] = bpmcsrfToken;
-                }
-
-                const response = await fetch(`${creatioBaseUrl}/0/odata/UsrSolicitudes(${solicitudId})`, {
-                    method: 'PATCH',
-                    headers: headers,
-                    credentials: 'include',
-                    body: JSON.stringify(formData)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Error sending data: ${response.status} ${response.statusText}`);
-                }
-
-                return await response.json();
-            } catch (error) {
-                console.error('Error sending data to Creatio:', error);
+                console.error('Error enviando datos a Lambda:', error);
                 throw error;
             }
         }
@@ -875,14 +825,14 @@
                 formData.UsrEspecificarOtroPL = document.getElementById('plazoEspecificar').value;
                 formData.UsrNumCuentaPlazo = document.getElementById('numCuentaPlazo').value;
                 formData.UsrDebitoCuentaPlazo = document.getElementById('debitoCuentaPlazo').value;
-                formData.UsrMontoApertura = parseFloat(document.getElementById('montoApertura').value) || 0;
+                formData.UsrMontoApertura = document.getElementById('montoApertura').value;
                 formData.UsrFuenteFondosPlazo = document.getElementById('fuenteFondosPlazo').value;
                 formData.UsrPropositoAperturaPlazo = document.getElementById('propositoAperturaPlazo').value;
                 formData.UsrFechaEfectiva = document.getElementById('fechaEfectiva').value;
                 formData.UsrFechaVencimiento = document.getElementById('fechaVencimiento').value;
                 formData.UsrInteresNominal = document.getElementById('interesNominal').value;
-                formData.UsrNumDiaPlazo = parseInt(document.getElementById('numDiasPlazo').value) || 0;
-                formData.UsrCalcDias = parseInt(document.getElementById('calcDias').value) || 0;
+                formData.UsrNumDiaPlazo = document.getElementById('numDiasPlazo').value;
+                formData.UsrCalcDias = document.getElementById('calcDias').value;
                 formData.UsrCertificadoDpf = document.getElementById('certificadoDpf').checked;
                 formData.UsrPagoIntereses = document.getElementById('pagoIntereses').value;
                 formData.UsrAcreditarCuenta = document.getElementById('acreditarCuenta').value;
@@ -898,13 +848,6 @@
                 formData.UsrActuaIntermediario = document.getElementById('actuaIntermediarioPlazo').checked;
                 formData.UsrIndicarNombre = document.getElementById('indicarNombrePlazo').value;
             }
-
-            // Limpiar valores vacíos
-            Object.keys(formData).forEach(key => {
-                if (formData[key] === '' || formData[key] === null || formData[key] === undefined) {
-                    delete formData[key];
-                }
-            });
 
             return formData;
         }
@@ -1019,21 +962,15 @@
                     submitBtn.disabled = true;
                     submitBtn.textContent = 'Procesando...';
 
-                    // Autenticar en Creatio
-                    const authSuccess = await authenticateCreatio();
-                    if (!authSuccess) {
-                        throw new Error('Error de autenticación en Creatio');
-                    }
-
                     // Recopilar datos del formulario
                     const formData = collectFormData();
                     console.log('Datos a enviar:', formData);
 
-                    // Enviar datos a Creatio
-                    const result = await sendDataToCreatio(formData);
+                    // Enviar datos a Lambda
+                    const result = await sendDataToLambda(formData);
                     
-                    showSuccess('Solicitud procesada correctamente en Creatio');
-                    console.log('Respuesta de Creatio:', result);
+                    showSuccess(`Solicitud procesada correctamente. ID: ${solicitudId}`);
+                    console.log('Respuesta de Lambda:', result);
 
                 } catch (error) {
                     console.error('Error al procesar la solicitud:', error);
