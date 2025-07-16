@@ -27,7 +27,7 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
         }
 
         .header {
@@ -53,6 +53,10 @@
 
         .form-section {
             margin-bottom: 30px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 25px;
+            background: #fafbfc;
         }
 
         .section-title {
@@ -74,6 +78,31 @@
             gap: 20px;
         }
 
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-with-text {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-with-text input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+        }
+
         label {
             display: block;
             margin-bottom: 8px;
@@ -82,8 +111,17 @@
             font-size: 0.95rem;
         }
 
+        .checkbox-label {
+            margin-bottom: 0;
+            font-weight: 400;
+            cursor: pointer;
+        }
+
         input[type="text"],
         input[type="date"],
+        input[type="number"],
+        input[type="email"],
+        input[type="tel"],
         select {
             width: 100%;
             padding: 14px 16px;
@@ -95,8 +133,17 @@
             color: #374151;
         }
 
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
         input[type="text"]:focus,
         input[type="date"]:focus,
+        input[type="number"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
         select:focus {
             outline: none;
             border-color: #456b85;
@@ -138,6 +185,12 @@
             transform: translateY(0);
         }
 
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .info-badge {
             background: #dbeafe;
             color: #1e40af;
@@ -147,8 +200,30 @@
             margin-bottom: 20px;
         }
 
+        .subsection {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #d1d5db;
+        }
+
+        .subsection-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 15px;
+        }
+
+        .dynamic-sections {
+            display: none;
+        }
+
+        .dynamic-sections.active {
+            display: block;
+        }
+
         @media (max-width: 768px) {
-            .form-row {
+            .form-row,
+            .form-row-3 {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
@@ -164,6 +239,11 @@
             .header h1 {
                 font-size: 1.5rem;
             }
+
+            .checkbox-with-text {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
 
         .loading {
@@ -175,6 +255,14 @@
         .error {
             background: #fee2e2;
             color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #d1fae5;
+            color: #065f46;
             padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -193,9 +281,8 @@
                 Cargando información...
             </div>
 
-            <div id="error" class="error" style="display: none;">
-                Error: No se pudieron obtener los datos de la URL
-            </div>
+            <div id="error" class="error" style="display: none;"></div>
+            <div id="success" class="success" style="display: none;"></div>
 
             <form id="bankForm" style="display: none;">
                 <div class="info-badge">
@@ -251,7 +338,7 @@
                     
                     <div class="form-group">
                         <label for="tipoCuenta">Seleccione el tipo de cuenta deseado</label>
-                        <select id="tipoCuenta" name="tipoCuenta" required disabled>
+                        <select id="tipoCuenta" name="tipoCuenta" required>
                             <option value="">Seleccione un tipo de cuenta...</option>
                             <option value="b07c45a2-fae8-48b8-9051-7b111a5a2e12">Cuenta de ahorro</option>
                             <option value="51f7d61c-e448-45de-948f-4d6d12db2be0">Cuenta corriente</option>
@@ -260,18 +347,400 @@
                     </div>
                 </div>
 
-                <button type="submit" class="submit-btn">Procesar Solicitud</button>
+                <!-- Secciones dinámicas para Cuenta de Ahorro -->
+                <div id="ahorroSections" class="dynamic-sections">
+                    <div class="form-section">
+                        <h3 class="section-title">Detalles de Cuenta de Ahorro</h3>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="ahorroRegular" name="UsrAhorroRegular">
+                            <label for="ahorroRegular" class="checkbox-label">Regular</label>
+                        </div>
+
+                        <div class="checkbox-with-text">
+                            <input type="checkbox" id="ahorroOtro" name="UsrAhorroOtro">
+                            <label for="ahorroOtro" class="checkbox-label">Otro:</label>
+                            <input type="text" id="ahorroEspecificar" name="UsrEspecificarOtroAH" placeholder="Especifique">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cuentaAhorro">Número de cuenta</label>
+                                <input type="text" id="cuentaAhorro" name="UsrCuentaAhorro">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="debitoCuentaAhorro">Débito a cuenta N°</label>
+                                <input type="text" id="debitoCuentaAhorro" name="UsrDebitoCuentaAhorro">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">Comentarios sobre la Apertura de la Cuenta</h3>
+                        
+                        <div class="form-group">
+                            <label for="fuenteFondosAhorro">Fuente de los fondos</label>
+                            <input type="text" id="fuenteFondosAhorro" name="UsrFuenteFondosAhorro">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="propositoApertura">Propósito de la apertura de la cuenta</label>
+                            <input type="text" id="propositoApertura" name="UsrPropositoApertura">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">Afiliar a Banca en Línea</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombreAdministrador">Nombre del administrador</label>
+                                <input type="text" id="nombreAdministrador" name="UsrNombreAdministradorText">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="identificacionBanca">Cédula/Pasaporte</label>
+                                <input type="text" id="identificacionBanca" name="UsrIdentificacionBancaLinea">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="celularBanca">Teléfono</label>
+                                <input type="tel" id="celularBanca" name="UsrCelularBancaLinea">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="correoBanca">Correo electrónico</label>
+                                <input type="email" id="correoBanca" name="UsrCorreoBancaLinea">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">Certificación de Beneficiario Final</h3>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="actuaIntermediario" name="UsrActuaIntermediario">
+                            <label for="actuaIntermediario" class="checkbox-label">¿Actúa como intermediario de otra(s) persona(s) que es el beneficiario (dueño) verdadero de estos fondos?</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="indicarNombre">Favor indicar el nombre de esta persona</label>
+                            <input type="text" id="indicarNombre" name="UsrIndicarNombre">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secciones dinámicas para Cuenta Corriente -->
+                <div id="corrienteSections" class="dynamic-sections">
+                    <div class="form-section">
+                        <h3 class="section-title">Detalles de Cuenta Corriente</h3>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="corrienteRegular" name="UsrRegularCorriente">
+                            <label for="corrienteRegular" class="checkbox-label">Regular</label>
+                        </div>
+
+                        <div class="checkbox-with-text">
+                            <input type="checkbox" id="corrienteOtro" name="UsrOtroCorriente">
+                            <label for="corrienteOtro" class="checkbox-label">Otro:</label>
+                            <input type="text" id="corrienteEspecificar" name="UsrEspecificarOtroCO" placeholder="Especifique">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="numCuentaCorriente">Número de cuenta</label>
+                                <input type="text" id="numCuentaCorriente" name="UsrNumCuentaCorriente">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="debitoCuentaCorriente">Débito a cuenta N°</label>
+                                <input type="text" id="debitoCuentaCorriente" name="UsrDebitoCuentaCorriente">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">Comentarios sobre la Apertura de la Cuenta</h3>
+                        
+                        <div class="form-group">
+                            <label for="fuenteFondosCorriente">Fuente de los fondos</label>
+                            <input type="text" id="fuenteFondosCorriente" name="UsrFuenteFondosCorriente">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="propositoAperturaCorriente">Propósito de la apertura de la cuenta</label>
+                            <input type="text" id="propositoAperturaCorriente" name="UsrPropositoAperturaCorriente">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="chequeraCuenta">Chequera (cuenta corriente #)</label>
+                                <input type="text" id="chequeraCuenta" name="UsrChequeraCuentaCorriente">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tipoChequera">Tipo de chequera</label>
+                                <select id="tipoChequera" name="UsrTipoChequeraCorriente">
+                                    <option value="">Seleccione...</option>
+                                    <option value="libro-sencillo">Libro sencillo (50 cheques)</option>
+                                    <option value="libro-copia">Libro con copia (25 cheques)</option>
+                                    <option value="libro-talonario">Libro con Talonario (50 cheques)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">Afiliar a Banca en Línea</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombreAdministradorCorriente">Nombre del administrador</label>
+                                <input type="text" id="nombreAdministradorCorriente" name="UsrNombreAdministradorText">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="identificacionBancaCorriente">Cédula/Pasaporte</label>
+                                <input type="text" id="identificacionBancaCorriente" name="UsrIdentificacionBancaLinea">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="celularBancaCorriente">Teléfono</label>
+                                <input type="tel" id="celularBancaCorriente" name="UsrCelularBancaLinea">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="correoBancaCorriente">Correo electrónico</label>
+                                <input type="email" id="correoBancaCorriente" name="UsrCorreoBancaLinea">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">Certificación de Beneficiario Final</h3>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="actuaIntermediarioCorriente" name="UsrActuaIntermediario">
+                            <label for="actuaIntermediarioCorriente" class="checkbox-label">¿Actúa como intermediario de otra(s) persona(s) que es el beneficiario (dueño) verdadero de estos fondos?</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="indicarNombreCorriente">Favor indicar el nombre de esta persona</label>
+                            <input type="text" id="indicarNombreCorriente" name="UsrIndicarNombre">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secciones dinámicas para Depósito a Plazo -->
+                <div id="plazoSections" class="dynamic-sections">
+                    <div class="form-section">
+                        <h3 class="section-title">Detalles de Depósito a Plazo</h3>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="plazoRegular" name="UsrRegularPlazo">
+                            <label for="plazoRegular" class="checkbox-label">Regular</label>
+                        </div>
+
+                        <div class="checkbox-with-text">
+                            <input type="checkbox" id="plazoOtro" name="UsrOtroPlazo">
+                            <label for="plazoOtro" class="checkbox-label">Otro:</label>
+                            <input type="text" id="plazoEspecificar" name="UsrEspecificarOtroPL" placeholder="Especifique">
+                        </div>
+
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label for="numCuentaPlazo">Número de cuenta</label>
+                                <input type="text" id="numCuentaPlazo" name="UsrNumCuentaPlazo">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="debitoCuentaPlazo">Débito a cuenta N°</label>
+                                <input type="text" id="debitoCuentaPlazo" name="UsrDebitoCuentaPlazo">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="montoApertura">Monto de apertura</label>
+                                <input type="number" step="0.01" id="montoApertura" name="UsrMontoApertura">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">Comentarios sobre la Apertura de la Cuenta</h3>
+                        
+                        <div class="form-group">
+                            <label for="fuenteFondosPlazo">Fuente de los fondos</label>
+                            <input type="text" id="fuenteFondosPlazo" name="UsrFuenteFondosPlazo">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="propositoAperturaPlazo">Propósito de la apertura de la cuenta</label>
+                            <input type="text" id="propositoAperturaPlazo" name="UsrPropositoAperturaPlazo">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">Detalles del Depósito (Plazo Fijo)</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fechaEfectiva">Fecha efectiva</label>
+                                <input type="date" id="fechaEfectiva" name="UsrFechaEfectiva">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="fechaVencimiento">Fecha vencimiento</label>
+                                <input type="date" id="fechaVencimiento" name="UsrFechaVencimiento">
+                            </div>
+                        </div>
+
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label for="interesNominal">Tasa de interés nominal</label>
+                                <input type="text" id="interesNominal" name="UsrInteresNominal">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="numDiasPlazo">N° Días / plazo</label>
+                                <input type="number" id="numDiasPlazo" name="UsrNumDiaPlazo">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="calcDias">Métodos de Cálculo / Base en Días</label>
+                                <input type="number" id="calcDias" name="UsrCalcDias">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="certificadoDpf" name="UsrCertificadoDpf">
+                                    <label for="certificadoDpf" class="checkbox-label">¿Certificado DPF impreso?</label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="pagoIntereses">Pago de intereses</label>
+                                <select id="pagoIntereses" name="UsrPagoIntereses">
+                                    <option value="">Seleccione...</option>
+                                    <option value="50250da7-8eab-4217-8080-2fe3ac3d8f18">Mensual</option>
+                                    <option value="af3006d2-e70b-432d-b0dc-c47f02749fe5">Trimestral</option>
+                                    <option value="34803f6a-fc9a-4464-8c93-a3e9226d650f">Semestral</option>
+                                    <option value="f7f2738a-c4b8-4958-aea8-2da44eebc53d">Anual</option>
+                                    <option value="ffb14cf7-fbae-4822-afbc-1bd8a28cff78">Al vencimiento</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="subsection">
+                            <h4 class="subsection-title">Disposiciones de los intereses</h4>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="acreditarCuenta">Acreditar a la cuenta N°</label>
+                                    <input type="text" id="acreditarCuenta" name="UsrAcreditarCuenta">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="aNombreDe">A nombre de</label>
+                                    <input type="text" id="aNombreDe" name="UsrANombreDe">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="subsection">
+                            <h4 class="subsection-title">Cancelar el depósito al vencimiento</h4>
+                            <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 15px;">
+                                (Los fondos serán aplicados a favor y en cuentas a nombre del titular del DPF)
+                            </p>
+                            
+                            <div class="form-group">
+                                <label for="acreditarCuentaSeg">Acreditar a la cuenta N°</label>
+                                <input type="text" id="acreditarCuentaSeg" name="UsrAcreditarCuentaSeg">
+                            </div>
+
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="renovarCapitalIntereses" name="UsrRenovarCapitalEIntereses">
+                                <label for="renovarCapitalIntereses" class="checkbox-label">Renovar capital e intereses por igual período</label>
+                            </div>
+
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="renovarCapital" name="UsrRenovarCapital">
+                                <label for="renovarCapital" class="checkbox-label">Renovar capital por igual período</label>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="instruccionesEspeciales">Instrucciones Especiales</label>
+                                <input type="text" id="instruccionesEspeciales" name="UsrInstruccionesEspeciales">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">Afiliar a Banca en Línea</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombreAdministradorPlazo">Nombre del administrador</label>
+                                <input type="text" id="nombreAdministradorPlazo" name="UsrNombreAdministradorText">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="identificacionBancaPlazo">Cédula/Pasaporte</label>
+                                <input type="text" id="identificacionBancaPlazo" name="UsrIdentificacionBancaLinea">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="celularBancaPlazo">Teléfono</label>
+                                <input type="tel" id="celularBancaPlazo" name="UsrCelularBancaLinea">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="correoBancaPlazo">Correo electrónico</label>
+                                <input type="email" id="correoBancaPlazo" name="UsrCorreoBancaLinea">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">Certificación de Beneficiario Final</h3>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="actuaIntermediarioPlazo" name="UsrActuaIntermediario">
+                            <label for="actuaIntermediarioPlazo" class="checkbox-label">¿Actúa como intermediario de otra(s) persona(s) que es el beneficiario (dueño) verdadero de estos fondos?</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="indicarNombrePlazo">Favor indicar el nombre de esta persona</label>
+                            <input type="text" id="indicarNombrePlazo" name="UsrIndicarNombre">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">Procesar Solicitud</button>
             </form>
         </div>
     </div>
 
     <script>
+        // Variables globales
+        let authCookies = null;
+        let bpmcsrfToken = null;
+        let solicitudId = null;
+        const creatioBaseUrl = 'https://11006607-demo.creatio.com';
+
         // Función para obtener parámetros de la URL
         function getURLParameters() {
             const params = {};
             const urlSearchParams = new URLSearchParams(window.location.search);
             
-            // Obtener todos los parámetros
             for (const [key, value] of urlSearchParams) {
                 params[key] = value;
             }
@@ -279,21 +748,218 @@
             return params;
         }
 
+        // Función para autenticar en Creatio
+        async function authenticateCreatio() {
+            try {
+                const response = await fetch(`${creatioBaseUrl}/ServiceModel/AuthService.svc/Login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        UserName: "Supervisor",
+                        UserPassword: "hS3433OgZwb2."
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Authentication failed: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.Code !== 0) {
+                    throw new Error(`Authentication error: ${result.Message}`);
+                }
+
+                // Obtener cookies de autenticación
+                const cookies = response.headers.get('Set-Cookie');
+                if (cookies) {
+                    authCookies = cookies;
+                }
+
+                // Obtener BPMCSRF token
+                const bpmcsrfResponse = await fetch(`${creatioBaseUrl}/0/rest/BpmCsrfToken`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+
+                if (bpmcsrfResponse.ok) {
+                    const tokenResult = await bpmcsrfResponse.json();
+                    bpmcsrfToken = tokenResult.BpmCsrfToken;
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Authentication error:', error);
+                return false;
+            }
+        }
+
+        // Función para enviar datos a Creatio
+        async function sendDataToCreatio(formData) {
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                };
+
+                if (bpmcsrfToken) {
+                    headers['BPMCSRF'] = bpmcsrfToken;
+                }
+
+                const response = await fetch(`${creatioBaseUrl}/0/odata/UsrSolicitudes(${solicitudId})`, {
+                    method: 'PATCH',
+                    headers: headers,
+                    credentials: 'include',
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error sending data: ${response.status} ${response.statusText}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('Error sending data to Creatio:', error);
+                throw error;
+            }
+        }
+
+        // Función para recopilar datos del formulario
+        function collectFormData() {
+            const tipoCuenta = document.getElementById('tipoCuenta').value;
+            const formData = {};
+            
+            // Datos según el tipo de cuenta
+            if (tipoCuenta === 'b07c45a2-fae8-48b8-9051-7b111a5a2e12') { // Cuenta de ahorro
+                formData.UsrAhorroRegular = document.getElementById('ahorroRegular').checked;
+                formData.UsrAhorroOtro = document.getElementById('ahorroOtro').checked;
+                formData.UsrEspecificarOtroAH = document.getElementById('ahorroEspecificar').value;
+                formData.UsrCuentaAhorro = document.getElementById('cuentaAhorro').value;
+                formData.UsrDebitoCuentaAhorro = document.getElementById('debitoCuentaAhorro').value;
+                formData.UsrFuenteFondosAhorro = document.getElementById('fuenteFondosAhorro').value;
+                formData.UsrPropositoApertura = document.getElementById('propositoApertura').value;
+                formData.UsrNombreAdministradorText = document.getElementById('nombreAdministrador').value;
+                formData.UsrIdentificacionBancaLinea = document.getElementById('identificacionBanca').value;
+                formData.UsrCelularBancaLinea = document.getElementById('celularBanca').value;
+                formData.UsrCorreoBancaLinea = document.getElementById('correoBanca').value;
+                formData.UsrActuaIntermediario = document.getElementById('actuaIntermediario').checked;
+                formData.UsrIndicarNombre = document.getElementById('indicarNombre').value;
+            } 
+            else if (tipoCuenta === '51f7d61c-e448-45de-948f-4d6d12db2be0') { // Cuenta corriente
+                formData.UsrRegularCorriente = document.getElementById('corrienteRegular').checked;
+                formData.UsrOtroCorriente = document.getElementById('corrienteOtro').checked;
+                formData.UsrEspecificarOtroCO = document.getElementById('corrienteEspecificar').value;
+                formData.UsrNumCuentaCorriente = document.getElementById('numCuentaCorriente').value;
+                formData.UsrDebitoCuentaCorriente = document.getElementById('debitoCuentaCorriente').value;
+                formData.UsrFuenteFondosCorriente = document.getElementById('fuenteFondosCorriente').value;
+                formData.UsrPropositoAperturaCorriente = document.getElementById('propositoAperturaCorriente').value;
+                formData.UsrChequeraCuentaCorriente = document.getElementById('chequeraCuenta').value;
+                formData.UsrTipoChequeraCorriente = document.getElementById('tipoChequera').value;
+                formData.UsrNombreAdministradorText = document.getElementById('nombreAdministradorCorriente').value;
+                formData.UsrIdentificacionBancaLinea = document.getElementById('identificacionBancaCorriente').value;
+                formData.UsrCelularBancaLinea = document.getElementById('celularBancaCorriente').value;
+                formData.UsrCorreoBancaLinea = document.getElementById('correoBancaCorriente').value;
+                formData.UsrActuaIntermediario = document.getElementById('actuaIntermediarioCorriente').checked;
+                formData.UsrIndicarNombre = document.getElementById('indicarNombreCorriente').value;
+            } 
+            else if (tipoCuenta === '92086c22-0943-46b1-bcbc-e4ae67b11531') { // Depósito a plazo
+                formData.UsrRegularPlazo = document.getElementById('plazoRegular').checked;
+                formData.UsrOtroPlazo = document.getElementById('plazoOtro').checked;
+                formData.UsrEspecificarOtroPL = document.getElementById('plazoEspecificar').value;
+                formData.UsrNumCuentaPlazo = document.getElementById('numCuentaPlazo').value;
+                formData.UsrDebitoCuentaPlazo = document.getElementById('debitoCuentaPlazo').value;
+                formData.UsrMontoApertura = parseFloat(document.getElementById('montoApertura').value) || 0;
+                formData.UsrFuenteFondosPlazo = document.getElementById('fuenteFondosPlazo').value;
+                formData.UsrPropositoAperturaPlazo = document.getElementById('propositoAperturaPlazo').value;
+                formData.UsrFechaEfectiva = document.getElementById('fechaEfectiva').value;
+                formData.UsrFechaVencimiento = document.getElementById('fechaVencimiento').value;
+                formData.UsrInteresNominal = document.getElementById('interesNominal').value;
+                formData.UsrNumDiaPlazo = parseInt(document.getElementById('numDiasPlazo').value) || 0;
+                formData.UsrCalcDias = parseInt(document.getElementById('calcDias').value) || 0;
+                formData.UsrCertificadoDpf = document.getElementById('certificadoDpf').checked;
+                formData.UsrPagoIntereses = document.getElementById('pagoIntereses').value;
+                formData.UsrAcreditarCuenta = document.getElementById('acreditarCuenta').value;
+                formData.UsrANombreDe = document.getElementById('aNombreDe').value;
+                formData.UsrAcreditarCuentaSeg = document.getElementById('acreditarCuentaSeg').value;
+                formData.UsrRenovarCapitalEIntereses = document.getElementById('renovarCapitalIntereses').checked;
+                formData.UsrRenovarCapital = document.getElementById('renovarCapital').checked;
+                formData.UsrInstruccionesEspeciales = document.getElementById('instruccionesEspeciales').value;
+                formData.UsrNombreAdministradorText = document.getElementById('nombreAdministradorPlazo').value;
+                formData.UsrIdentificacionBancaLinea = document.getElementById('identificacionBancaPlazo').value;
+                formData.UsrCelularBancaLinea = document.getElementById('celularBancaPlazo').value;
+                formData.UsrCorreoBancaLinea = document.getElementById('correoBancaPlazo').value;
+                formData.UsrActuaIntermediario = document.getElementById('actuaIntermediarioPlazo').checked;
+                formData.UsrIndicarNombre = document.getElementById('indicarNombrePlazo').value;
+            }
+
+            // Limpiar valores vacíos
+            Object.keys(formData).forEach(key => {
+                if (formData[key] === '' || formData[key] === null || formData[key] === undefined) {
+                    delete formData[key];
+                }
+            });
+
+            return formData;
+        }
+
+        // Función para mostrar/ocultar secciones según tipo de cuenta
+        function toggleAccountSections() {
+            const tipoCuenta = document.getElementById('tipoCuenta').value;
+            const ahorroSections = document.getElementById('ahorroSections');
+            const corrienteSections = document.getElementById('corrienteSections');
+            const plazoSections = document.getElementById('plazoSections');
+
+            // Ocultar todas las secciones
+            ahorroSections.classList.remove('active');
+            corrienteSections.classList.remove('active');
+            plazoSections.classList.remove('active');
+
+            // Mostrar la sección correspondiente
+            if (tipoCuenta === 'b07c45a2-fae8-48b8-9051-7b111a5a2e12') { // Cuenta de ahorro
+                ahorroSections.classList.add('active');
+            } else if (tipoCuenta === '51f7d61c-e448-45de-948f-4d6d12db2be0') { // Cuenta corriente
+                corrienteSections.classList.add('active');
+            } else if (tipoCuenta === '92086c22-0943-46b1-bcbc-e4ae67b11531') { // Depósito a plazo
+                plazoSections.classList.add('active');
+            }
+        }
+
+        // Función para mostrar mensaje de error
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('success').style.display = 'none';
+        }
+
+        // Función para mostrar mensaje de éxito
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+        }
+
         // Función para llenar el formulario con los datos de la URL
         function fillForm() {
             const params = getURLParameters();
             const loadingDiv = document.getElementById('loading');
-            const errorDiv = document.getElementById('error');
             const form = document.getElementById('bankForm');
 
-            // Verificar si tenemos los parámetros necesarios
+            // Verificar parámetros requeridos
             const requiredParams = ['nombre', 'apellido', 'nacionalidad', 'identificacion', 'tipo_identificacion', 'fecha_nacimiento', 'tipo_cuenta', 'id_solicitud'];
             const missingParams = requiredParams.filter(param => !params[param]);
 
             if (missingParams.length > 0) {
                 loadingDiv.style.display = 'none';
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = `Faltan los siguientes parámetros en la URL: ${missingParams.join(', ')}`;
+                showError(`Faltan los siguientes parámetros en la URL: ${missingParams.join(', ')}`);
                 return;
             }
 
@@ -304,14 +970,14 @@
                 document.getElementById('nacionalidad').value = params.nacionalidad || '';
                 document.getElementById('identificacion').value = params.identificacion || '';
                 document.getElementById('fechaNacimiento').value = params.fecha_nacimiento || '';
+                document.getElementById('tipoIdentificacion').value = params.tipo_identificacion || '';
                 document.getElementById('tipoCuenta').value = params.tipo_cuenta || '';
                 
-                // Seleccionar el tipo de identificación
-                const tipoIdentificacion = document.getElementById('tipoIdentificacion');
-                tipoIdentificacion.value = params.tipo_identificacion || '';
+                // Guardar ID de solicitud
+                solicitudId = params.id_solicitud;
 
-                const tipoCuenta = document.getElementById('tipoCuenta');
-                tipoCuenta.value = params.tipo_cuenta || '';
+                // Mostrar secciones correspondientes al tipo de cuenta
+                toggleAccountSections();
 
                 // Ocultar loading y mostrar formulario
                 loadingDiv.style.display = 'none';
@@ -319,41 +985,66 @@
 
             } catch (error) {
                 loadingDiv.style.display = 'none';
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = 'Error al procesar los datos de la URL';
+                showError('Error al procesar los datos de la URL');
                 console.error('Error:', error);
             }
         }
 
-        // Manejar el envío del formulario
-        document.getElementById('bankForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            fillForm();
             
-            const tipoCuenta = document.getElementById('tipoCuenta').value;
+            // Listener para cambio de tipo de cuenta
+            document.getElementById('tipoCuenta').addEventListener('change', toggleAccountSections);
             
-            if (!tipoCuenta) {
-                alert('Por favor seleccione un tipo de cuenta');
-                return;
-            }
+            // Listener para envío del formulario
+            document.getElementById('bankForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const submitBtn = document.getElementById('submitBtn');
+                const tipoCuenta = document.getElementById('tipoCuenta').value;
+                
+                if (!tipoCuenta) {
+                    showError('Por favor seleccione un tipo de cuenta');
+                    return;
+                }
 
-            // Recopilar todos los datos del formulario
-            const formData = {
-                nombre: document.getElementById('nombre').value,
-                apellido: document.getElementById('apellido').value,
-                nacionalidad: document.getElementById('nacionalidad').value,
-                identificacion: document.getElementById('identificacion').value,
-                tipoIdentificacion: document.getElementById('tipoIdentificacion').value,
-                fechaNacimiento: document.getElementById('fechaNacimiento').value,
-                tipoCuenta: tipoCuenta
-            };
+                if (!solicitudId) {
+                    showError('ID de solicitud no encontrado');
+                    return;
+                }
 
-            // Mostrar los datos recopilados (aquí puedes enviar a tu servidor)
-            console.log('Datos del formulario:', formData);
-            alert('Solicitud procesada correctamente. Revisa la consola para ver los datos.');
+                try {
+                    // Deshabilitar botón de envío
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Procesando...';
+
+                    // Autenticar en Creatio
+                    const authSuccess = await authenticateCreatio();
+                    if (!authSuccess) {
+                        throw new Error('Error de autenticación en Creatio');
+                    }
+
+                    // Recopilar datos del formulario
+                    const formData = collectFormData();
+                    console.log('Datos a enviar:', formData);
+
+                    // Enviar datos a Creatio
+                    const result = await sendDataToCreatio(formData);
+                    
+                    showSuccess('Solicitud procesada correctamente en Creatio');
+                    console.log('Respuesta de Creatio:', result);
+
+                } catch (error) {
+                    console.error('Error al procesar la solicitud:', error);
+                    showError(`Error al procesar la solicitud: ${error.message}`);
+                } finally {
+                    // Rehabilitar botón de envío
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Procesar Solicitud';
+                }
+            });
         });
-
-        // Cargar datos cuando la página esté lista
-        document.addEventListener('DOMContentLoaded', fillForm);
     </script>
 </body>
 </html>

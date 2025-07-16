@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Cuenta Bancaria</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, #dce2e5 0%, #bfcbd3 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #456b85 0%, #456b85 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #f9fafb;
+            color: #374151;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #456b85;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            background-color: white;
+        }
+
+        input[readonly] {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+            color: #6b7280;
+        }
+
+        select {
+            cursor: pointer;
+            background-color: white;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .info-badge {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Solicitud de Cuenta Bancaria</h1>
+            <p>Complete la información requerida para procesar su solicitud</p>
+        </div>
+
+        <div class="form-container">
+            <div id="loading" class="loading">
+                Cargando información...
+            </div>
+
+            <div id="error" class="error" style="display: none;">
+                Error: No se pudieron obtener los datos de la URL
+            </div>
+
+            <form id="bankForm" style="display: none;">
+                <div class="info-badge">
+                    Los datos personales han sido pre-cargados y no pueden ser modificados
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Información Personal</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" id="nombre" name="nombre" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="apellido">Apellido</label>
+                            <input type="text" id="apellido" name="apellido" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nacionalidad">Nacionalidad</label>
+                            <input type="text" id="nacionalidad" name="nacionalidad" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="fechaNacimiento">Fecha de Nacimiento</label>
+                            <input type="date" id="fechaNacimiento" name="fechaNacimiento" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tipoIdentificacion">Tipo de Identificación</label>
+                            <select id="tipoIdentificacion" name="tipoIdentificacion" disabled>
+                                <option value="">Seleccione...</option>
+                                <option value="ea17ea9f-f2d1-43bc-a75a-5b75fe8c8afd">Cédula</option>
+                                <option value="77b8be7b-eb93-4fd3-9a3f-12e858cef29b">Pasaporte</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="identificacion">Número de Identificación</label>
+                            <input type="text" id="identificacion" name="identificacion" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Tipo de Cuenta</h3>
+                    
+                    <div class="form-group">
+                        <label for="tipoCuenta">Seleccione el tipo de cuenta deseado</label>
+                        <select id="tipoCuenta" name="tipoCuenta" required disabled>
+                            <option value="">Seleccione un tipo de cuenta...</option>
+                            <option value="b07c45a2-fae8-48b8-9051-7b111a5a2e12">Cuenta de ahorro</option>
+                            <option value="51f7d61c-e448-45de-948f-4d6d12db2be0">Cuenta corriente</option>
+                            <option value="92086c22-0943-46b1-bcbc-e4ae67b11531">Depósito de plazo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Procesar Solicitud</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Función para obtener parámetros de la URL
+        function getURLParameters() {
+            const params = {};
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            
+            // Obtener todos los parámetros
+            for (const [key, value] of urlSearchParams) {
+                params[key] = value;
+            }
+            
+            return params;
+        }
+
+        // Función para llenar el formulario con los datos de la URL
+        function fillForm() {
+            const params = getURLParameters();
+            const loadingDiv = document.getElementById('loading');
+            const errorDiv = document.getElementById('error');
+            const form = document.getElementById('bankForm');
+
+            // Verificar si tenemos los parámetros necesarios
+            const requiredParams = ['nombre', 'apellido', 'nacionalidad', 'identificacion', 'tipo_identificacion', 'fecha_nacimiento', 'tipo_cuenta', 'id_solicitud'];
+            const missingParams = requiredParams.filter(param => !params[param]);
+
+            if (missingParams.length > 0) {
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = `Faltan los siguientes parámetros en la URL: ${missingParams.join(', ')}`;
+                return;
+            }
+
+            try {
+                // Llenar los campos del formulario
+                document.getElementById('nombre').value = params.nombre || '';
+                document.getElementById('apellido').value = params.apellido || '';
+                document.getElementById('nacionalidad').value = params.nacionalidad || '';
+                document.getElementById('identificacion').value = params.identificacion || '';
+                document.getElementById('fechaNacimiento').value = params.fecha_nacimiento || '';
+                document.getElementById('tipoCuenta').value = params.tipo_cuenta || '';
+                
+                // Seleccionar el tipo de identificación
+                const tipoIdentificacion = document.getElementById('tipoIdentificacion');
+                tipoIdentificacion.value = params.tipo_identificacion || '';
+
+                const tipoCuenta = document.getElementById('tipoCuenta');
+                tipoCuenta.value = params.tipo_cuenta || '';
+
+                // Ocultar loading y mostrar formulario
+                loadingDiv.style.display = 'none';
+                form.style.display = 'block';
+
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = 'Error al procesar los datos de la URL';
+                console.error('Error:', error);
+            }
+        }
+
+        // Manejar el envío del formulario
+        document.getElementById('bankForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const tipoCuenta = document.getElementById('tipoCuenta').value;
+            
+            if (!tipoCuenta) {
+                alert('Por favor seleccione un tipo de cuenta');
+                return;
+            }
+
+            // Recopilar todos los datos del formulario
+            const formData = {
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value,
+                nacionalidad: document.getElementById('nacionalidad').value,
+                identificacion: document.getElementById('identificacion').value,
+                tipoIdentificacion: document.getElementById('tipoIdentificacion').value,
+                fechaNacimiento: document.getElementById('fechaNacimiento').value,
+                tipoCuenta: tipoCuenta
+            };
+
+            // Mostrar los datos recopilados (aquí puedes enviar a tu servidor)
+            console.log('Datos del formulario:', formData);
+            alert('Solicitud procesada correctamente. Revisa la consola para ver los datos.');
+        });
+
+        // Cargar datos cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', fillForm);
+    </script>
+</body>
+</html>
