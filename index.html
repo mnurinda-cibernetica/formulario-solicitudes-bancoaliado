@@ -360,7 +360,13 @@
                         <div class="checkbox-with-text">
                             <input type="checkbox" id="ahorroOtro" name="UsrAhorroOtro">
                             <label for="ahorroOtro" class="checkbox-label">Otro:</label>
-                            <input type="text" id="ahorroEspecificar" name="UsrEspecificarOtroAH" placeholder="Especifique">
+                            <select id="ahorroEspecificar" name="UsrOtroDropId">
+                                <option value="">Especifique...</option>
+                                <option value="e92e2a99-59bc-4c13-8f94-cf8d6a1430c7">Cuenta Preferida</option>
+                                <option value="73a07392-b766-44c1-909b-09aeb369da00">Cuenta Conmigo</option>
+                                <option value="c76981ae-a64d-46cc-9cc3-c641d652ca9d">Navicuenta</option>
+                                <option value="4a76c2d8-2b12-46cd-b0d2-b28e94af4c2e">Aliado Kids</option>
+                            </select>
                         </div>
 
                         <div class="form-row">
@@ -790,7 +796,7 @@
             if (tipoCuenta === 'b07c45a2-fae8-48b8-9051-7b111a5a2e12') { // Cuenta de ahorro
                 formData.UsrAhorroRegular = document.getElementById('ahorroRegular').checked;
                 formData.UsrAhorroOtro = document.getElementById('ahorroOtro').checked;
-                formData.UsrEspecificarOtroAH = document.getElementById('ahorroEspecificar').value;
+                formData.UsrOtroDropId = document.getElementById('ahorroEspecificar').value;
                 formData.UsrCuentaAhorro = document.getElementById('cuentaAhorro').value;
                 formData.UsrDebitoCuentaAhorro = document.getElementById('debitoCuentaAhorro').value;
                 formData.UsrFuenteFondosAhorro = document.getElementById('fuenteFondosAhorro').value;
